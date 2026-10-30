@@ -1,0 +1,216 @@
+/* Shared viewport and input rules, loaded after page styles. */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { min-width: 280px; overflow-x: clip; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; }
+.touch-instructions, .dock-short-label { display: none; }
+.palace-experience, .palace-experience .hall-hero, .museum-gallery { height: 100dvh; }
+.museum-map-trigger { bottom: calc(16px + var(--safe-bottom)); right: calc(16px + var(--safe-right)); }
+.museum-map-panel { max-height: calc(100dvh - 24px - var(--safe-top) - var(--safe-bottom)); }
+.museum-map-panel > :first-child, .museum-map-panel > :last-child { flex-shrink: 0; }
+.museum-map-body { min-height: 0; overflow-y: auto; }
+.museum-map-panel > :last-child { padding-bottom: max(12px, var(--safe-bottom)); }
+.palace-experience .hall-topbar { padding-top: calc(18px + var(--safe-top)); padding-right: calc(24px + var(--safe-right)); padding-left: calc(24px + var(--safe-left)); }
+.palace-navigation { bottom: calc(24px + var(--safe-bottom)); max-width: calc(100vw - 320px - var(--safe-left) - var(--safe-right)); }
+.palace-icon-button, .gallery-close-info, .palace-directory-close, .skill-detail > button { min-width: 44px; min-height: 44px; }
+.hall-welcome-card { max-height: calc(100dvh - 40px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto; }
+.palace-directory { max-height: calc(100dvh - 40px - var(--safe-top) - var(--safe-bottom)); overscroll-behavior: contain; }
+.palace-nav-dock > button { min-height: 44px; }
+.gallery-exhibit-card { min-height: 0; }
+.gallery-exhibit-scroll { min-height: 0; overflow-y: auto; }
+.gallery-exhibit-navigation { bottom: calc(24px + var(--safe-bottom)); max-width: calc(100vw - 180px); }
+.gallery-exhibit-navigation > span { min-width: 0; }
+.gallery-exhibit-navigation small { max-width: min(260px, 35vw); }
+.museum-gallery-nav { padding-top: calc(18px + var(--safe-top)); padding-right: calc(24px + var(--safe-right)); padding-left: calc(24px + var(--safe-left)); }
+.entrance-topbar { padding-top: calc(16px + var(--safe-top)); padding-right: calc(20px + var(--safe-right)); padding-left: calc(20px + var(--safe-left)); }
+.entrance-skip, .entrance-hint-button { min-height: 44px; }
+.entrance-static-actions { max-width: calc(100vw - 32px); flex-wrap: wrap; justify-content: center; gap: 10px; }
+.observatory-nav { padding-top: calc(20px + var(--safe-top)); }
+.skill-row > span:nth-child(2) { min-width: 0; flex: 1; }
+.skill-row strong { overflow-wrap: anywhere; }
+.catalogue-logo { flex-shrink: 0; }
+.catalogue-level { flex-shrink: 0; }
+.skill-detail { max-height: calc(100dvh - 100px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+
+@media (pointer: coarse) {
+  .desktop-instructions { display: none; }
+  .touch-instructions { display: inline; }
+  .skill-filters button { min-height: 48px; }
+  .skill-planet { min-width: 48px; min-height: 52px; }
+}
+@media (max-width: 1023px) {
+  .museum-map-trigger { width: 48px; height: 48px; padding: 8px; }
+  .museum-map-trigger > span:not(:first-child) { display: none; }
+  .palace-navigation { max-width: calc(100vw - 140px - var(--safe-left) - var(--safe-right)); }
+}
+@media (max-width: 767px) {
+  .museum-gallery-nav, .observatory-nav { gap: 10px; }
+  .museum-gallery-nav .btn-quiet, .observatory-nav .btn-quiet { flex-shrink: 0; padding: 8px 10px; font-size: 9px; letter-spacing: .06em; }
+  .gallery-wordmark, .observatory-wordmark { font-size: 16px; min-width: 0; text-align: right; line-height: 1.2; }
+  .museum-gallery-nav > span { display: none; }
+  .museum-map-panel { max-height: calc(100dvh - 12px - var(--safe-top)); }
+}
+@media (max-width: 639px) {
+  .palace-experience .hall-topbar { padding: calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) 10px calc(14px + var(--safe-left)); }
+  .palace-experience .hall-wordmark { font-size: 15px; white-space: normal; line-height: 1.2; max-width: calc(100vw - 90px - var(--safe-left) - var(--safe-right)); }
+  .palace-top-actions { gap: 0; }
+  .palace-experience .hall-welcome-button { top: calc(65px + var(--safe-top)); left: calc(16px + var(--safe-left)); min-height: 44px; font-size: 9px; }
+  .palace-room-caption { left: calc(18px + var(--safe-left)); bottom: calc(194px + var(--safe-bottom)); max-width: calc(100vw - 40px - var(--safe-left) - var(--safe-right)); }
+  .palace-room-caption h1 { font-size: clamp(25px, 7.5vw, 34px); line-height: 1.1; }
+  .palace-room-caption > span { font-size: 9px; line-height: 1.6; }
+  .palace-room-caption.is-exploring { top: calc(118px + var(--safe-top)); left: calc(18px + var(--safe-left)); max-width: calc(100vw - 45px); }
+  .palace-room-caption.is-exploring h1 { font-size: 24px; }
+  .palace-navigation { width: calc(100% - 24px - var(--safe-left) - var(--safe-right)); max-width: none; bottom: calc(76px + var(--safe-bottom)); gap: 12px; }
+  .palace-nav-dock { width: 100%; gap: 2px; padding: 4px; }
+  .palace-nav-dock > button { flex: 1 1 0; min-width: 0; min-height: 56px; padding: 7px 2px; gap: 6px; font-size: 10px; letter-spacing: 0; line-height: 1.2; white-space: normal; }
+  .dock-full-label { display: none; }
+  .dock-short-label { display: inline; }
+  .palace-movement-hint { max-width: 290px; font-size: 10px; line-height: 1.6; white-space: normal; }
+  .palace-directory-backdrop { padding: calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom)); }
+  .palace-directory .hall-paths-title { font-size: 32px; }
+  .palace-directory .hall-paths-grid { gap: 10px; }
+  .palace-directory .hall-path-card { min-height: 190px; padding: 14px 12px; }
+  .palace-directory .hall-path-name { font-size: 24px; overflow-wrap: anywhere; }
+  .palace-directory .hall-path-tagline { font-size: 11px; }
+  .palace-directory .hall-path-floor, .palace-directory .hall-path-action { font-size: 9px; }
+  .museum-gallery-nav { padding: calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) 10px calc(14px + var(--safe-left)); }
+  .museum-gallery-title { top: calc(83px + var(--safe-top)); left: calc(18px + var(--safe-left)); right: calc(18px + var(--safe-right)); max-width: none; }
+  .museum-gallery-title h1 { font-size: 30px; max-width: 290px; }
+  .museum-gallery-title > .eyebrow { font-size: 9px; }
+  .museum-gallery-title > p:last-child { font-size: 11px; line-height: 1.65; max-width: 270px; }
+  .museum-gallery[data-info-open='true'] .museum-gallery-title > p:last-child { display: none; }
+  .gallery-exhibit-navigation { bottom: calc(76px + var(--safe-bottom)); width: calc(100vw - 28px - var(--safe-left) - var(--safe-right)); max-width: 390px; justify-content: space-between; box-sizing: border-box; }
+  .gallery-exhibit-navigation > span { min-width: 0; flex: 1; font-size: 12px; }
+  .gallery-exhibit-navigation small { font-size: 10px; max-width: calc(100vw - 150px - var(--safe-left) - var(--safe-right)); }
+  .gallery-exhibit-navigation button { flex-shrink: 0; min-width: 44px; min-height: 44px; }
+  .gallery-walk-hint { bottom: calc(148px + var(--safe-bottom)); width: 290px; max-width: calc(100vw - 36px); font-size: 10px; line-height: 1.5; }
+  .gallery-exhibit-card { left: calc(12px + var(--safe-left)); right: calc(12px + var(--safe-right)); width: auto; top: auto; bottom: calc(198px + var(--safe-bottom)); max-height: min(48dvh, calc(100dvh - 380px - var(--safe-top) - var(--safe-bottom))); }
+  .gallery-exhibit-scroll { padding: 24px 20px 18px; }
+  .gallery-exhibit-scroll h2 { font-size: 29px; padding-right: 10px; }
+  .gallery-exhibit-description { font-size: 12px; }
+  .gallery-exhibit-scroll li { font-size: 11px; }
+  .gallery-resume-link { min-height: 44px; padding: 10px 20px; font-size: 9px; }
+  .gallery-open-info { top: auto; bottom: calc(198px + var(--safe-bottom)); right: calc(16px + var(--safe-right)); min-height: 44px; font-size: 10px; }
+  .gallery-empty-note { bottom: calc(90px + var(--safe-bottom)); font-size: 12px; }
+  .entrance-topbar { gap: 10px; }
+  .entrance-wordmark { min-width: 0; }
+  .entrance-wordmark-text { font-size: 9px; letter-spacing: .08em; white-space: normal; }
+  .entrance-skip { flex-shrink: 0; padding: 8px 10px; font-size: 10px; }
+  .entrance-plaque-wrap { width: calc(100vw - 32px); bottom: calc(92px + var(--safe-bottom)); }
+  .entrance-plaque h1 { font-size: clamp(26px, 7vw, 38px); }
+  .entrance-hint { font-size: 10px; }
+  .entrance-static-actions { bottom: calc(88px + var(--safe-bottom)); width: calc(100vw - 32px); }
+  .entrance-static .entrance-plaque-wrap { bottom: calc(165px + var(--safe-bottom)); }
+  .observatory-nav { padding-top: calc(14px + var(--safe-top)); }
+  .observatory-wordmark { font-size: 15px; }
+  .observatory-heading h1 { font-size: clamp(39px, 11vw, 54px); }
+  .observatory-heading > p:last-child { font-size: 12px; }
+  .observatory { height: 520px; }
+  .observatory-caption { bottom: 120px; font-size: 9px; letter-spacing: .08em; }
+  .orbit-controls { flex-wrap: wrap; gap: 12px; left: 16px; right: 16px; }
+  .category-legend { width: 100%; gap: 8px; justify-content: space-between; font-size: 10px; }
+  .orbit-controls .btn-quiet { margin-left: auto; font-size: 10px; min-height: 44px; padding: 10px 12px; }
+  .skill-detail { position: fixed; top: auto; right: calc(12px + var(--safe-right)); left: calc(12px + var(--safe-left)); bottom: calc(80px + var(--safe-bottom)); width: auto; max-width: none; max-height: calc(68dvh - var(--safe-top) - var(--safe-bottom)); padding: 25px 22px; z-index: 55; }
+  .skill-detail h2 { font-size: 34px; padding-right: 22px; }
+  .skill-detail dt, .provisional-note { font-size: 10px; }
+  .skill-detail dd { font-size: 13px; }
+  .orbit-key { gap: 6px; }
+  .orbit-key > span { font-size: 10px; overflow-wrap: anywhere; }
+  .skill-filters { gap: 20px; }
+  .skill-filters button { font-size: 12px; }
+  .skill-row { gap: 10px; min-height: 76px; }
+  .skill-row strong { font-size: 13px; }
+  .skill-row small { font-size: 10px; }
+  .catalogue-level { font-size: 11px; max-width: 90px; }
+  .catalogue-level small { letter-spacing: 1px; }
+  .catalogue-note { font-size: 11px; }
+}
+@media (max-width: 767px) and (max-height: 720px) {
+  .museum-gallery-title > p:last-child { display: none; }
+  .palace-room-caption h1 { font-size: 26px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .palace-experience .hall-topbar, .museum-gallery-nav { padding-top: calc(8px + var(--safe-top)); padding-bottom: 5px; }
+  .palace-experience .hall-welcome-button { top: calc(57px + var(--safe-top)); bottom: auto; left: calc(20px + var(--safe-left)); }
+  .palace-room-caption, .palace-room-caption.is-exploring { top: calc(105px + var(--safe-top)); bottom: auto; left: calc(20px + var(--safe-left)); max-width: 240px; }
+  .palace-room-caption h1, .palace-room-caption.is-exploring h1 { font-size: 24px; }
+  .palace-navigation { bottom: calc(12px + var(--safe-bottom)); max-width: calc(100vw - 150px - var(--safe-left) - var(--safe-right)); gap: 7px; }
+  .palace-nav-dock > button { min-height: 44px; padding: 7px 12px; }
+  .palace-movement-hint { font-size: 9px; }
+  .gallery-exhibit-navigation { bottom: calc(12px + var(--safe-bottom)); max-width: calc(100vw - 160px); width: auto; }
+  .gallery-walk-hint { bottom: calc(80px + var(--safe-bottom)); font-size: 9px; }
+  .museum-gallery-title { top: calc(78px + var(--safe-top)); left: calc(20px + var(--safe-left)); max-width: 240px; }
+  .museum-gallery-title h1 { font-size: 28px; }
+  .museum-gallery-title > p:last-child { display: none; }
+  .gallery-exhibit-card { top: calc(76px + var(--safe-top)); bottom: calc(110px + var(--safe-bottom)); left: auto; right: calc(16px + var(--safe-right)); width: min(330px, 45vw); max-height: none; }
+  .gallery-open-info { top: calc(76px + var(--safe-top)); bottom: auto; right: calc(16px + var(--safe-right)); }
+  .gallery-exhibit-scroll { padding: 22px; }
+  .gallery-exhibit-scroll h2 { font-size: 27px; }
+  .gallery-exhibit-metric { font-size: 24px; padding: 10px 0; }
+  .gallery-exhibit-description { font-size: 12px; }
+  .skill-detail { position: fixed; top: calc(12px + var(--safe-top)); bottom: calc(76px + var(--safe-bottom)); left: auto; right: calc(12px + var(--safe-right)); width: min(350px, 65vw); max-height: none; z-index: 55; padding: 22px; }
+  .entrance-static-actions { bottom: calc(66px + var(--safe-bottom)); }
+  .entrance-static .entrance-plaque-wrap { bottom: calc(130px + var(--safe-bottom)); }
+}
+/* Native page scrolling stays available over decorative 3D scenes. */
+.entrance-canvas :where(div, canvas), .observatory-scene :where(div, canvas) { touch-action: pan-y !important; }
+.entrance-sticky, .entrance-stage { height: 100dvh; }
+@media (max-width: 639px) {
+  .planet-name { max-width: 95px; font-size: 10px; overflow: hidden; text-overflow: ellipsis; }
+  .skill-planet { min-width: 48px; min-height: 52px; }
+  .planet-logo { width: 36px; height: 36px; }
+}
+.scene-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; padding: 110px 24px 180px; text-align: center; background: #142019; }
+.scene-fallback h2 { font-size: clamp(28px, 5vw, 45px); }
+.scene-fallback > p:not(.eyebrow) { font-size: 13px; line-height: 1.7; max-width: 300px; color: #c5c3b1; }
+.scene-fallback button { pointer-events: auto; z-index: 35; }
+@media (max-height:500px) and (orientation:landscape) {
+  .gallery-exhibit-card.exhibit-dossier { width:min(350px,45vw); }
+}
+:root {
+  --mobile-notice-bg: #07100e;
+}
+
+.mobile-experience-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #050b0dcc;
+  backdrop-filter: blur(12px);
+}
+
+.mobile-experience-card {
+  width: min(100%, 430px);
+  padding: 32px 26px;
+  color: #e8dfc8;
+  background: linear-gradient(145deg, #1a2822, var(--mobile-notice-bg));
+  border: 1px solid #c7a66d88;
+  box-shadow: 0 24px 80px #000b, inset 0 0 0 3px #c7a66d12;
+}
+
+.mobile-experience-card h1 {
+  margin: 12px 0 16px;
+  color: #f0d79d;
+  font: 400 clamp(30px, 8vw, 44px) var(--font-display);
+  line-height: .98;
+}
+
+.mobile-experience-card p:not(.eyebrow) {
+  margin: 0 0 24px;
+  color: #b9c5b9;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.mobile-experience-card .btn-gold {
+  width: 100%;
+}

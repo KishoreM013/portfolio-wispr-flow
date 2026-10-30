@@ -1,0 +1,563 @@
+/* ─────────────────────────────────────────────────────────────
+   THE MAIN HALL — a dark marble room with a lit statue.
+   The room itself is WebGL; this file is the interface over it.
+   ───────────────────────────────────────────────────────────── */
+
+.hall-page {
+  position: relative;
+  overflow-x: clip;
+  color: var(--color-cream);
+  background: #08070d;
+}
+
+.hall-hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #08070d;
+}
+
+.hall-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.hall-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+.hall-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(5, 4, 3, 0.62) 0%, transparent 20%, transparent 68%, rgba(5, 4, 3, 0.82) 100%),
+    radial-gradient(ellipse 78% 72% at 50% 44%, transparent 40%, rgba(5, 4, 3, 0.55) 86%, rgba(5, 4, 3, 0.88) 100%);
+  pointer-events: none;
+}
+
+.hall-topbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+}
+
+@media (min-width: 640px) {
+  .hall-topbar {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+.hall-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 0.9vw, 10px);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hall-wordmark-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(201, 163, 94, 0.55);
+  color: var(--color-gold-bright);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1;
+  background: rgba(9, 8, 6, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.hall-roomlabel {
+  color: var(--color-gold-bright);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hall-bottom {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 12;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-bottom: 1.4rem;
+}
+
+.hall-guide-wrap {
+  max-width: min(430px, 92vw);
+}
+
+.hall-welcome-button {
+  position: absolute;
+  bottom: 1.55rem;
+  left: 50%;
+  z-index: 13;
+  min-height: 44px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(201, 163, 94, 0.55);
+  border-radius: 2px;
+  padding: 0.65rem 1.1rem;
+  background: rgba(9, 8, 6, 0.62);
+  color: var(--color-gold-bright);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease,
+    background 0.25s ease;
+}
+
+.hall-welcome-button:hover {
+  border-color: var(--color-gold-bright);
+  background: rgba(201, 163, 94, 0.14);
+  color: var(--color-cream);
+}
+
+/* ── welcome card ──────────────────────────────────────────── */
+.hall-welcome-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(4, 3, 2, 0.76);
+  backdrop-filter: blur(10px);
+  animation: fade-in 0.3s ease both;
+}
+
+.hall-welcome-card {
+  position: relative;
+  width: min(540px, 100%);
+  border: 1px solid rgba(201, 163, 94, 0.55);
+  padding: clamp(1.4rem, 5vw, 2.5rem);
+  background:
+    linear-gradient(180deg, rgba(30, 25, 17, 0.96) 0%, rgba(12, 10, 7, 0.98) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(233, 205, 142, 0.1),
+    0 30px 90px rgba(0, 0, 0, 0.7);
+}
+
+.hall-welcome-card::before,
+.hall-welcome-card::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 10px rgba(201, 163, 94, 0.6);
+}
+
+.hall-welcome-card::before {
+  left: 9px;
+}
+
+.hall-welcome-card::after {
+  right: 9px;
+}
+
+.hall-welcome-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(201, 163, 94, 0.3);
+  border-radius: 2px;
+  color: var(--color-cream-dim);
+  background: rgba(8, 7, 5, 0.6);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.hall-welcome-close:hover {
+  border-color: var(--color-gold-bright);
+  color: var(--color-gold-bright);
+}
+
+/* ── the eight hanging gallery signs ──────────────────────── */
+.hall-paths {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(201, 163, 94, 0.16);
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(3.5rem, 6vw, 5rem);
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 0%, rgba(201, 163, 94, 0.08), transparent 70%),
+    linear-gradient(180deg, #0b0a08 0%, #08070d 100%);
+}
+
+.hall-paths-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.hall-paths-title {
+  margin-top: 0.6rem;
+  color: var(--color-cream);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.hall-paths-aside {
+  max-width: 360px;
+  padding-bottom: 0.35rem;
+}
+
+.hall-paths-aside p {
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.hall-paths-progress {
+  margin-top: 0.8rem;
+  color: var(--color-gold-bright) !important;
+  font-family: var(--font-mono);
+  font-size: 9px !important;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hall-paths-rail {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 163, 94, 0.45) 12%,
+    rgba(201, 163, 94, 0.45) 88%,
+    transparent
+  );
+}
+
+.hall-paths-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem 1.25rem;
+}
+
+.hall-path {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.hall-path-chain {
+  position: relative;
+  display: block;
+  height: 1.75rem;
+  margin-left: 1.9rem;
+}
+
+.hall-path-chain::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(201, 163, 94, 0.65), rgba(201, 163, 94, 0.12));
+}
+
+.hall-path-chain::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 21px;
+  height: 1px;
+  background: rgba(201, 163, 94, 0.35);
+}
+
+.hall-path-ring {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(201, 163, 94, 0.75);
+  border-radius: 999px;
+  background: #0b0a08;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.hall-path-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 13.5rem;
+  border: 1px solid rgba(201, 163, 94, 0.22);
+  padding: 1.35rem 1.35rem 1.1rem;
+  background: linear-gradient(180deg, rgba(27, 23, 17, 0.82) 0%, rgba(13, 11, 8, 0.96) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(233, 205, 142, 0.04),
+    0 18px 40px -24px rgba(0, 0, 0, 0.9);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.hall-path:hover .hall-path-card,
+.hall-path:focus-visible .hall-path-card {
+  transform: translateY(-4px);
+  border-color: rgba(233, 205, 142, 0.65);
+  background: linear-gradient(180deg, rgba(37, 31, 22, 0.9) 0%, rgba(17, 14, 10, 0.98) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(233, 205, 142, 0.08),
+    0 26px 50px -24px rgba(0, 0, 0, 0.95);
+}
+
+.hall-path:hover .hall-path-ring,
+.hall-path:focus-visible .hall-path-ring {
+  background: var(--color-gold-bright);
+  box-shadow: 0 0 12px rgba(201, 163, 94, 0.7);
+}
+
+.hall-path:focus-visible {
+  outline: none;
+}
+
+.hall-path:focus-visible .hall-path-card {
+  outline: 2px solid rgba(233, 205, 142, 0.75);
+  outline-offset: 3px;
+}
+
+.hall-path-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hall-path-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(201, 163, 94, 0.3);
+  border-radius: 2px;
+  color: var(--color-gold-bright);
+  background: rgba(201, 163, 94, 0.05);
+}
+
+.hall-path-number {
+  color: rgba(201, 163, 94, 0.65);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+
+.hall-path-name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.15rem;
+  color: var(--color-cream);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.7rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.hall-path-tagline {
+  margin-top: 0.45rem;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hall-path-meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.1rem;
+}
+
+.hall-path-floor {
+  max-width: 70%;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.hall-path-action {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-gold-bright);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hall-path.is-seen .hall-path-card {
+  border-color: rgba(201, 163, 94, 0.4);
+}
+
+.hall-path.is-seen .hall-path-icon {
+  border-color: rgba(201, 163, 94, 0.5);
+  background: rgba(201, 163, 94, 0.1);
+}
+
+@media (min-width: 640px) {
+  .hall-paths-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .hall-paths-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .hall-paths-head {
+    display: block;
+  }
+
+  .hall-paths-aside {
+    max-width: none;
+    margin-top: 1.4rem;
+  }
+
+  .hall-path-card {
+    min-height: 0;
+  }
+}
+
+/* ── small screens / landscape ─────────────────────────────── */
+@media (max-width: 640px) {
+  .hall-welcome-button {
+    bottom: 1.1rem;
+    padding: 0.6rem 0.85rem;
+    font-size: 8px;
+    letter-spacing: 0.16em;
+  }
+
+  .hall-bottom {
+    padding-bottom: 4.4rem;
+    padding-left: 0.75rem;
+  }
+
+  .hall-guide-wrap {
+    max-width: 250px;
+  }
+
+  .hall-guide-wrap > div {
+    gap: 0.5rem;
+  }
+
+  .hall-guide-wrap svg {
+    width: 44px;
+    height: 58px;
+  }
+
+  .hall-guide-wrap .guide-bubble {
+    max-width: 190px;
+    padding: 0.5rem 0.65rem;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .hall-roomlabel {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .hall-wordmark {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+  }
+
+  .hall-wordmark-mark {
+    width: 26px;
+    height: 26px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .hall-bottom {
+    padding-bottom: 1rem;
+  }
+
+  .hall-welcome-button {
+    bottom: 1rem;
+  }
+
+  .hall-guide-wrap {
+    max-width: 360px;
+  }
+}
+
+/* Gallery wayfinding: architectural labels, restrained editorial interface. */
+.gallery-door-label{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:142px;padding:9px 14px;border:1px solid #d1bc8b60;background:#171c18e8;color:#f1e7ce;font-family:var(--font-display);font-size:20px;white-space:nowrap;box-shadow:0 4px 14px #0006;text-decoration:none}.gallery-door-label span{font:7px var(--font-mono);letter-spacing:.16em;color:#c7ad75}.gallery-door-label:hover,.gallery-door-label:focus-visible{background:#37382a;border-color:#e7ce95}.hall-vignette{background:linear-gradient(180deg,#090d1077,transparent 22%,transparent 70%,#090d10ed),radial-gradient(ellipse at center,transparent 50%,#090d1040);z-index:2}.hall-bottom{pointer-events:none;justify-content:space-between;align-items:end;padding-bottom:35px}.hall-curator-note h1{font-size:clamp(30px,4vw,54px);font-weight:400;margin-top:8px;letter-spacing:-.02em}.hall-curator-note>p:last-child{font-size:11px;margin-top:8px;color:#c2bbac}.hall-curator-note .eyebrow{font-size:8px}.hall-floor-control{display:flex;gap:0;pointer-events:auto;margin-right:120px;border:1px solid #b7a07566;background:#101610bb;backdrop-filter:blur(12px)}.hall-floor-control button{padding:13px 18px;color:#95896f;font:10px var(--font-mono);cursor:pointer;min-height:50px}.hall-floor-control button span{margin-left:10px}.hall-floor-control button[aria-pressed=true]{background:#bda27318;color:#efd5a0;box-shadow:inset 0 -2px #c9a35e}.hall-welcome-button{bottom:auto;top:95px;left:50%;background:#11181288}.hall-path-chain,.hall-paths-rail{display:none}.hall-paths-grid{gap:20px}.hall-path-card{background:linear-gradient(145deg,#20241c55,#11150f33);border-color:#a7956c35;box-shadow:none;min-height:12rem}.hall-paths{background:#0c100e}.hall-path-icon{border:0;background:none;width:auto;height:auto}.hall-path-number{font-size:11px}.hall-paths-title{font-weight:400}.hall-paths-head{margin-bottom:35px}.hall-topbar{max-width:none;padding-right:4%;padding-left:4%}.hall-wordmark{font-family:var(--font-display);font-size:19px;letter-spacing:.03em;text-transform:none}.hall-wordmark-mark{font-size:20px;border-color:#c9a35e66}.hall-roomlabel{font-size:8px}.hall-hero{min-height:850px;height:100svh}
+@media(max-width:639px){.hall-hero{min-height:740px;max-height:960px}.hall-roomlabel{font-size:7px}.hall-wordmark{font-size:15px;gap:8px}.hall-welcome-button{top:80px;font-size:8px;min-height:38px}.hall-bottom{flex-direction:column;align-items:start;gap:18px;padding-bottom:85px}.hall-floor-control{margin-right:0}.hall-floor-control button{font-size:9px;padding:10px 15px;min-height:44px}.hall-curator-note h1{font-size:35px}.hall-paths-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.hall-path-card{padding:16px 12px;min-height:205px}.hall-path-name{font-size:24px}.hall-path-tagline{font-size:11px}.hall-path-meta{flex-direction:column;align-items:start;gap:10px}.hall-path-floor{max-width:100%;font-size:7px}.gallery-door-label{font-size:18px;min-width:130px}}
+
+/* Immersive palace rotunda: the architecture is the interface. */
+.palace-experience{height:100svh;overflow:hidden;background:#171c1b}.palace-experience .hall-hero{height:100svh;min-height:0;max-height:none}.palace-experience .hall-canvas{inset:0;touch-action:none}.palace-experience .hall-vignette{background:linear-gradient(180deg,#080d1255 0%,transparent 18%,transparent 73%,#070d10c9 100%),linear-gradient(90deg,#090d1125,transparent 18%,transparent 82%,#090d1125)}.palace-experience .frame-line{display:none}.palace-experience .hall-topbar{padding:22px 32px;pointer-events:none}.palace-experience .hall-wordmark,.palace-top-actions{pointer-events:auto}.palace-experience .hall-wordmark{font-size:17px;text-shadow:0 2px 12px #0009}.palace-top-actions{display:flex;gap:24px;align-items:center}.palace-icon-button{width:38px;height:38px;display:grid;place-items:center;border:1px solid #c7b38944;color:#e7d5b2;background:#0d161866;backdrop-filter:blur(8px);cursor:pointer}.palace-experience .hall-welcome-button{top:auto;bottom:33px;left:30px;transform:none;min-height:36px;padding:6px 0;border:0;background:transparent;font-size:8px;color:#c7b592;backdrop-filter:none;border-bottom:1px solid #c7b59255}.palace-room-caption{position:absolute;z-index:12;bottom:125px;left:32px;pointer-events:none;text-shadow:0 3px 14px #000}.palace-room-caption>span{font:8px var(--font-mono);letter-spacing:.25em;color:#cbb68c}.palace-room-caption h1{font-size:clamp(27px,3vw,43px);font-weight:400;margin-top:8px;letter-spacing:-.02em;color:#ede1c9}.palace-navigation{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:70vw}.palace-movement-hint{font:8px var(--font-mono);letter-spacing:.1em;color:#d2c9b8;text-align:center;text-shadow:0 2px 5px #000;white-space:nowrap}.palace-nav-dock{display:flex;align-items:stretch;gap:4px;padding:5px;border:1px solid #bba57950;background:linear-gradient(135deg,#13201ee8,#101714ed);backdrop-filter:blur(18px);box-shadow:0 10px 40px #0004}.palace-nav-dock>button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:9px 15px;font:9px var(--font-mono);letter-spacing:.035em;color:#adab9b;white-space:nowrap;cursor:pointer;border:1px solid transparent}.palace-nav-dock>button[aria-pressed=true],.palace-nav-dock>button[aria-expanded=true]{color:#f1d49b;background:#c7a66d12;border-color:#c7a66d44}.palace-nav-dock>button:hover{color:#f1d49b;background:#c7a66d0f}.palace-door-plaque{display:flex;flex-direction:column;align-items:center;justify-content:center;width:200px;min-height:70px;padding:8px 12px;border:1px solid #a98a5144;background:linear-gradient(130deg,#1d231cf5,#111813f5);box-shadow:inset 0 0 0 3px #b69b6315,0 3px 9px #0005;color:#e6d1a5;font:23px var(--font-display);text-align:center;line-height:1.1}.palace-door-plaque small{font:6px var(--font-mono);letter-spacing:.16em;color:#bba77e;display:block;margin-bottom:5px}.palace-door-plaque span{font:7px var(--font-mono);letter-spacing:.06em;color:#c5ae7f;margin-top:7px}.palace-door-plaque:hover,.palace-door-plaque:focus-visible{border-color:#ebcb88;background:#2c3023}.palace-stair-plaque{display:flex;flex-direction:column;align-items:center;width:240px;padding:9px 15px;font:23px var(--font-display);color:#e3d1a9;background:#16201af0;border:1px solid #c7a36577;box-shadow:0 5px 12px #0005;cursor:pointer}.palace-stair-plaque span{font:8px var(--font-mono);margin-top:6px;color:#c3ab7c}.palace-directory-backdrop{position:fixed;inset:0;z-index:70;background:#060c10a8;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:5vh 5vw}.palace-directory{position:relative;max-height:85svh;overflow:auto;max-width:1150px;width:100%;border:1px solid #c3aa6e55;box-shadow:0 20px 100px #000a}.palace-directory .hall-paths{padding:45px 0;background:linear-gradient(135deg,#1b241e,#101814)}.palace-directory .hall-paths-title{font-size:43px}.palace-directory .hall-paths-head{margin-bottom:24px}.palace-directory .hall-path-card{min-height:175px}.palace-directory .hall-paths-grid{gap:12px}.palace-directory-close{position:absolute;right:12px;top:12px;z-index:5;cursor:pointer;color:#deca9d;padding:10px}.palace-directory .hall-paths-aside{padding-right:25px}.palace-experience .hall-welcome-modal{z-index:75}
+.palace-zoom-control{position:absolute;right:32px;bottom:31px;z-index:31;display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid #bba57950;background:#101714dd;color:#d7c8a9;font:8px var(--font-mono);letter-spacing:.12em;text-transform:uppercase;box-shadow:0 8px 25px #0005}.palace-zoom-control input{width:105px;accent-color:#c9a35e}.palace-zoom-control output{min-width:32px;color:#f1d49b;text-align:right}
+@media(max-width:900px){.palace-nav-dock>button{padding:8px 10px;font-size:8px;gap:6px}.palace-navigation{max-width:90vw}.palace-room-caption{bottom:145px}.palace-experience .hall-welcome-button{bottom:auto;top:75px;left:32px}.palace-experience .hall-roomlabel{display:none}.palace-zoom-control{right:18px;bottom:31px}}@media(max-width:639px){.palace-experience .hall-topbar{padding:16px}.palace-experience .hall-wordmark{font-size:15px}.palace-experience .hall-welcome-button{left:16px;top:62px;font-size:7px}.palace-room-caption{left:20px;bottom:160px}.palace-room-caption h1{font-size:29px}.palace-room-caption>span{font-size:7px}.palace-navigation{bottom:78px;width:calc(100% - 24px);max-width:none;gap:12px}.palace-movement-hint{font-size:7px;white-space:normal;max-width:290px;line-height:1.7}.palace-nav-dock{width:100%;gap:2px;padding:4px}.palace-nav-dock>button{flex:1;flex-direction:column;padding:8px 4px;gap:6px;min-height:52px;font-size:7px}.palace-directory-backdrop{padding:20px 12px}.palace-directory{max-height:90svh}.palace-directory .hall-paths{padding:40px 0 25px}.palace-directory .hall-paths-title{font-size:35px}.palace-directory .hall-paths-aside{display:none}.palace-directory .hall-path-card{min-height:180px}.palace-directory .hall-paths-head{display:block}.palace-experience .hall-roomlabel{display:none}.palace-zoom-control{right:12px;bottom:145px;padding:7px 9px}.palace-zoom-control input{width:74px}.palace-zoom-control span{display:none}}@media(max-height:550px) and (min-width:640px){.palace-room-caption{bottom:95px}.palace-room-caption h1{font-size:25px}.palace-navigation{bottom:15px}.palace-experience .hall-welcome-button{top:65px}}
+
+/* Museum interpretation boards sit beside open passages at reading height. */
+.palace-arch-board{width:220px;min-height:180px;display:flex;flex-direction:column;justify-content:center;padding:19px 21px;border:1px solid #b69b6970;background:linear-gradient(140deg,#18251ff7,#0e1915fa);box-shadow:inset 0 0 0 4px #c0a67312;color:#e8ddc2;line-height:1.25;text-align:left;text-decoration:none}.palace-arch-board small{font:7px var(--font-mono);letter-spacing:.15em;color:#c2aa76;padding-bottom:12px;border-bottom:1px solid #c2aa7638}.palace-arch-board strong{font:31px var(--font-display);font-weight:400;margin-top:12px;line-height:1}.palace-arch-board>span{font:10px var(--font-sans);color:#b4b6a6;line-height:1.5;margin-top:9px}.palace-arch-board em{font:7px var(--font-mono);font-style:normal;color:#c9b383;margin-top:15px;letter-spacing:.05em}.palace-arch-board:hover,.palace-arch-board:focus-visible{border-color:#f4d493;background:linear-gradient(140deg,#2b3523,#17251b);color:#fff1cf}.palace-arch-board:focus-visible{outline:3px solid #ebcc8d;outline-offset:5px}
+
+/* Router-independent, high-contrast labels with a matching WebGL fallback. */
+.palace-arch-board{width:200px;min-height:160px;box-sizing:border-box;padding:16px 14px;align-items:center;text-align:center;justify-content:center;gap:12px;background:#14231c;color:#fff1ce;border:2px solid #d4b879;pointer-events:auto;cursor:pointer;box-shadow:inset 0 0 0 4px #14231c}.palace-arch-board small{font-size:10px;line-height:1.5;letter-spacing:.08em;color:#e6ce99;padding:0 0 10px;width:100%;border-color:#d4b87966}.palace-arch-board strong{font-family:Georgia,serif;font-size:36px;line-height:1.08;margin:0;font-weight:400;overflow-wrap:normal}.palace-arch-board em{font-size:11px;line-height:1.5;letter-spacing:.03em;margin-top:3px;color:#f3d79a}.palace-arch-board:hover,.palace-arch-board:focus-visible{color:#fff7e5;background:#293b29;border-color:#ffe1a1}
+
+/* Keep the viewport frame clear while exploring close to the architecture. */
+.palace-room-caption{max-width:calc(100vw - 64px);overflow:hidden}.palace-room-caption h1{overflow-wrap:anywhere}.palace-room-caption.is-exploring{bottom:auto;top:95px;left:32px;max-width:260px}.palace-room-caption.is-exploring h1{font-size:26px;line-height:1.15}.palace-navigation{width:max-content;max-width:calc(100vw - 230px)}.palace-nav-dock{max-width:100%;box-sizing:border-box}.palace-nav-dock>button{flex-shrink:1;min-width:0}.palace-experience .hall-canvas canvas:focus-visible{outline:2px solid #d4b879;outline-offset:-3px}@media(max-width:900px){.palace-navigation{max-width:calc(100vw - 30px)}.palace-room-caption.is-exploring{top:115px}}@media(max-width:639px){.palace-navigation{width:calc(100% - 24px);max-width:calc(100vw - 24px)}.palace-room-caption.is-exploring{top:112px;left:20px;max-width:210px}.palace-room-caption.is-exploring h1{font-size:23px}}

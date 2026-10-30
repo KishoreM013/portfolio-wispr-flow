@@ -1,0 +1,378 @@
+/* ─────────────────────────────────────────────────────────────
+   THE ENTRANCE — scroll-driven 3D approach to the museum.
+   The scene itself is WebGL; this file is the cinematic frame
+   and the interface that sits over it.
+   ───────────────────────────────────────────────────────────── */
+
+.entrance-scroll {
+  position: relative;
+  height: 340svh;
+  background: #08070d;
+}
+
+.entrance-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.entrance-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  --p: 0;
+  --plaque: 1;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 62%, rgba(120, 77, 38, 0.2), transparent 70%),
+    #08070d;
+}
+
+.entrance-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.entrance-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+.entrance-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background:
+    linear-gradient(180deg, rgba(5, 4, 3, 0.55) 0%, transparent 20%, transparent 68%, rgba(5, 4, 3, 0.82) 100%),
+    radial-gradient(ellipse 82% 74% at 50% 44%, transparent 42%, rgba(5, 4, 3, 0.5) 84%, rgba(5, 4, 3, 0.86) 100%);
+  pointer-events: none;
+}
+
+/* ── interface ─────────────────────────────────────────────── */
+.entrance-topbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .entrance-topbar {
+    padding: 1.5rem 2rem;
+  }
+}
+
+.entrance-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--color-cream);
+}
+
+.entrance-wordmark-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(201, 163, 94, 0.55);
+  color: var(--color-gold-bright);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1;
+  background: rgba(9, 8, 6, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.entrance-wordmark-text {
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 0.9vw, 10px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.entrance-skip {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(201, 163, 94, 0.45);
+  border-radius: 2px;
+  padding: 0.55rem 0.9rem;
+  background: rgba(9, 8, 6, 0.5);
+  color: var(--color-cream-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease,
+    background 0.25s ease;
+}
+
+.entrance-skip:hover {
+  border-color: var(--color-gold-bright);
+  background: rgba(201, 163, 94, 0.12);
+  color: var(--color-gold-bright);
+}
+
+.entrance-plaque-wrap {
+  position: absolute;
+  bottom: 10.5vh;
+  left: 50%;
+  z-index: 25;
+  width: min(640px, 88vw);
+  transform: translateX(-50%) translateY(calc((1 - var(--plaque)) * 22px));
+  opacity: var(--plaque);
+  pointer-events: none;
+}
+
+.entrance-hint-button {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.entrance-stage.is-past-plaque .entrance-hint-button {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.entrance-plaque {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(201, 163, 94, 0.55);
+  padding: clamp(1.1rem, 3.2vw, 1.8rem) clamp(1.25rem, 4vw, 2.6rem);
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(30, 25, 17, 0.9) 0%, rgba(15, 12, 8, 0.94) 60%, rgba(10, 8, 6, 0.96) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(233, 205, 142, 0.1),
+    0 0 60px rgba(201, 163, 94, 0.14),
+    0 30px 80px rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+}
+
+.entrance-plaque::before,
+.entrance-plaque::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 8px rgba(201, 163, 94, 0.6);
+}
+
+.entrance-plaque::before {
+  left: 8px;
+}
+
+.entrance-plaque::after {
+  right: 8px;
+}
+
+.entrance-plaque-glow {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(ellipse at 50% 40%, rgba(233, 205, 142, 0.12), transparent 60%);
+  pointer-events: none;
+}
+
+.entrance-plaque h1 {
+  position: relative;
+  margin-top: 0.45rem;
+  color: var(--color-cream);
+  font-size: clamp(1.9rem, 5.6vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.entrance-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  color: var(--color-gold-bright);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.entrance-hint svg {
+  animation: scroll-hint 2.2s ease-in-out infinite;
+}
+
+.entrance-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  height: 2px;
+  background: rgba(201, 163, 94, 0.1);
+}
+
+.entrance-progress-bar {
+  height: 100%;
+  transform: scaleX(var(--p));
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(201, 163, 94, 0.5), var(--color-gold-bright));
+  box-shadow: 0 0 12px rgba(233, 205, 142, 0.45);
+}
+
+.entrance-roomlabel {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 1.4rem;
+  z-index: 30;
+  color: rgba(243, 234, 217, 0.5);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.entrance-whiteout {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: radial-gradient(circle at 50% 55%, #fff8e8 0%, #efd9ae 45%, #c9a35e 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.entrance-whiteout.is-entering {
+  opacity: 1;
+}
+
+/* ── static / reduced-motion entrance ──────────────────────── */
+.entrance-static {
+  position: relative;
+  display: flex;
+  min-height: 100svh;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  background: #08070d;
+}
+
+.entrance-static .entrance-stage {
+  --p: 0.4;
+  --plaque: 1;
+}
+
+.entrance-static .entrance-plaque-wrap {
+  bottom: 12vh;
+}
+
+.entrance-static-actions {
+  position: absolute;
+  bottom: 4.5vh;
+  left: 50%;
+  z-index: 26;
+  display: flex;
+  transform: translateX(-50%);
+  gap: 0.75rem;
+}
+
+/* ── small screens / lite mode ─────────────────────────────── */
+@media (max-width: 640px) {
+  .entrance-scroll {
+    height: 320svh;
+  }
+
+  .entrance-plaque-wrap {
+    bottom: 5.4rem;
+    width: 92vw;
+  }
+
+  .entrance-plaque {
+    padding: 0.95rem 1.1rem 0.8rem;
+  }
+
+  .entrance-plaque h1 {
+    font-size: clamp(1.65rem, 7.2vw, 2.1rem);
+  }
+
+  .entrance-hint {
+    margin-top: 0.55rem;
+    font-size: 8px;
+  }
+
+  .entrance-roomlabel {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .entrance-wordmark-text {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+  }
+
+  .entrance-skip {
+    padding: 0.5rem 0.7rem;
+    font-size: 9px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .entrance-plaque-wrap {
+    bottom: 1rem;
+    width: min(560px, 62vw);
+  }
+
+  .entrance-plaque {
+    padding: 0.7rem 1.2rem;
+  }
+
+  .entrance-plaque h1 {
+    font-size: clamp(1.45rem, 4vw, 2.1rem);
+  }
+
+  .entrance-hint {
+    margin-top: 0.35rem;
+  }
+
+  .entrance-topbar {
+    padding: 0.7rem 1rem;
+  }
+
+  .entrance-roomlabel {
+    display: none;
+  }
+}
+
+/* An understated arrival plaque, in keeping with the interior galleries. */
+.entrance-plaque{border-color:#c5ae7860;background:linear-gradient(140deg,#191b16ec,#0a100bed);box-shadow:0 24px 80px #0008,inset 0 1px #e6d0a015;backdrop-filter:blur(16px)}.entrance-plaque h1{font-weight:400;letter-spacing:-.015em}.entrance-wordmark-mark{background:#14191499}.entrance-plaque-glow{opacity:.35}.entrance-hint{letter-spacing:.2em}.entrance-skip{backdrop-filter:blur(12px)}
+
+/* Leave the enlarged elevation and its stone steps visible behind the welcome. */
+@media (min-width: 769px) and (min-height: 521px) {
+  .entrance-plaque-wrap { width: min(540px, 70vw); bottom: 5.5vh; }
+  .entrance-plaque { padding: 18px 28px 14px; }
+  .entrance-plaque h1 { font-size: clamp(32px, 3vw, 43px); line-height: 1.04; }
+  .entrance-hint { margin-top: 8px; }
+  .entrance-static .entrance-plaque-wrap { bottom: 14vh; }
+}
+.entrance-vignette {
+  background: linear-gradient(180deg, #060b1438 0%, transparent 18%, transparent 70%, #05090dbb 100%),
+    radial-gradient(ellipse 92% 88% at 50% 42%, transparent 52%, #03060b55 100%);
+}

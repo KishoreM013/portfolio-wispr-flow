@@ -1,0 +1,302 @@
+@import 'tailwindcss';
+
+/* ─────────────────────────────────────────────────────────────
+   THE MUSEUM OF KISHORE — design tokens
+   Warm black, deep charcoal, cream, aged gold.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --color-ink: #090806;
+  --color-charcoal: #12100c;
+  --color-charcoal-2: #191611;
+  --color-stone: #262119;
+  --color-line: #3a3225;
+  --color-cream: #f3ead9;
+  --color-cream-dim: #d9cdb8;
+  --color-muted: #a79a84;
+  --color-gold: #c9a35e;
+  --color-gold-bright: #e9cd8e;
+  --color-gold-dim: #8d723f;
+  --color-marble: #e7dfcf;
+  --color-marble-dim: #cfc5b1;
+
+  --radius-plaque: 0.375rem;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-ink font-sans text-cream antialiased;
+    background-image:
+      radial-gradient(70rem 45rem at 50% -15%, #c9a35e12, transparent 60%),
+      radial-gradient(50rem 40rem at 90% 110%, #3a2a1020, transparent 65%);
+    background-attachment: fixed;
+  }
+
+  /* A very light film grain over everything. Static, cheap, adds depth. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-bright);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-medium text-cream;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-museum {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12;
+  }
+
+  .eyebrow {
+    @apply font-mono text-[10px] font-medium tracking-[0.28em] text-gold uppercase sm:text-[11px];
+  }
+
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-sm px-6 py-3 text-[12px] font-semibold tracking-[0.16em] uppercase transition-all duration-300;
+  }
+
+  .btn-gold {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-gold-bright/70 px-6 py-3 text-[12px] font-semibold tracking-[0.16em] text-ink uppercase transition-all duration-300;
+    background: linear-gradient(180deg, #eed79d 0%, #c9a35e 55%, #a98344 100%);
+    box-shadow:
+      0 1px 0 #fff2cf66 inset,
+      0 12px 30px -12px #c9a35e66;
+  }
+
+  .btn-gold:hover {
+    background: linear-gradient(180deg, #f5e4b6 0%, #d7b471 55%, #b8934f 100%);
+    box-shadow:
+      0 1px 0 #fff2cf80 inset,
+      0 18px 40px -12px #c9a35e88;
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-gold/45 bg-transparent px-6 py-3 text-[12px] font-semibold tracking-[0.16em] text-cream uppercase transition-all duration-300;
+  }
+
+  .btn-outline:hover {
+    @apply border-gold bg-gold/10 text-gold-bright;
+  }
+
+  .btn-quiet {
+    @apply inline-flex min-h-11 items-center gap-2 rounded-sm border border-line/80 bg-charcoal/60 px-4 py-2 font-mono text-[10px] tracking-[0.18em] text-cream-dim uppercase transition-colors hover:border-gold/60 hover:text-gold-bright;
+  }
+
+  .plaque {
+    @apply relative rounded-[var(--radius-plaque)] border border-gold/40;
+    background:
+      linear-gradient(180deg, #1c1812 0%, #12100c 60%, #0d0b08 100%);
+    box-shadow:
+      inset 0 0 0 1px #c9a35e14,
+      inset 0 1px 0 #f3ead910,
+      0 24px 70px -24px #000000cc;
+  }
+
+  .plaque::before,
+  .plaque::after {
+    content: '';
+    position: absolute;
+    top: 7px;
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-gold);
+    opacity: 0.7;
+    box-shadow: 0 0 8px #c9a35e88;
+  }
+  .plaque::before {
+    left: 8px;
+  }
+  .plaque::after {
+    right: 8px;
+  }
+
+  .room-frame {
+    @apply relative min-h-svh overflow-x-clip pb-24;
+  }
+
+  .frame-line {
+    @apply pointer-events-none fixed inset-2 z-30 border border-gold/12 sm:inset-3;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded-sm border border-line bg-white/[0.02] px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-cream-dim uppercase;
+  }
+
+  .guide-bubble {
+    @apply relative rounded-md border border-gold/30 bg-charcoal/95 px-4 py-3 text-[13px] leading-relaxed text-cream-dim shadow-2xl backdrop-blur-sm;
+  }
+
+  .guide-bubble::before {
+    content: '';
+    position: absolute;
+    top: 1.15rem;
+    left: -9px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 9px solid var(--color-gold);
+    opacity: 0.55;
+  }
+
+  .guide-bubble::after {
+    content: '';
+    position: absolute;
+    top: 1.25rem;
+    left: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 8px solid #12100c;
+  }
+
+  .gold-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c9a35e66, transparent);
+  }
+}
+
+@layer utilities {
+  .text-gold-gradient {
+    background: linear-gradient(180deg, #f7e9c6 0%, #d8b878 48%, #a98344 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .room-enter {
+    animation: room-enter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .fade-up {
+    animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .fade-in {
+    animation: fade-in 0.8s ease both;
+  }
+
+  .float-slow {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+
+  .glow-pulse {
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+
+  .scroll-hint {
+    animation: scroll-hint 2.2s ease-in-out infinite;
+  }
+}
+
+@keyframes room-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+/* Shared museum furniture: engraved brass, paper tones and generous space. */
+.curator-annotation{display:flex;align-items:start;gap:18px;max-width:460px;border-top:1px solid #c9a35e40;padding-top:22px}.curator-monogram{display:grid;place-items:center;width:38px;height:43px;flex-shrink:0;border:1px solid #c9a35e55;font:28px var(--font-display);color:#cfb77f}.curator-annotation p{font:8px var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:#b9a172;margin:2px 0 8px}.curator-annotation blockquote{font-family:var(--font-display);font-style:italic;font-size:22px;line-height:1.35;color:#d4cbbb}.room-frame>div>header .plaque{border:0;background:none;box-shadow:none}.room-frame>div>header .plaque:before,.room-frame>div>header .plaque:after{display:none}.room-frame>div>header h1{font-weight:400}.room-frame{background:radial-gradient(ellipse at 50% 0%,#28271c55,transparent 70%),#0c100e}.btn-gold{background:linear-gradient(130deg,#dac28e,#bfa26c);box-shadow:inset 0 1px #f8e5bd55;color:#171710}.plaque{border-radius:1px}.frame-line{opacity:.55}
