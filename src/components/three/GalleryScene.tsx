@@ -12,7 +12,7 @@ import type { Exhibit } from '../../data/collection'
 import { createMarbleTexture, createStoneTexture } from './textures'
 import { clampGalleryProgress, exhibitPlacement, focusAtProgress, galleryCameraZ, maxGalleryProgress, galleryLength, galleryEndZ, GALLERY_ENTRANCE_Z } from './galleryNavigation'
 
-type GalleryProps = { exhibits: Exhibit[]; selected: number; onSelect: (index: number) => void; onBrowse: (index: number) => void; navigationKey: number; onEndChange?: (atEnd: boolean) => void; onBookClick?: () => void; writing?: boolean; lite: boolean; reduced: boolean }
+type GalleryProps = { exhibits: Exhibit[]; selected: number; onSelect: (index: number) => void; onBrowse: (index: number) => void; navigationKey: number; onEndChange?: (atEnd: boolean) => void; onBookClick?: () => void; writing?: boolean; endPortraitSrc?: string; lite: boolean; reduced: boolean }
 function GalleryCamera({ exhibits, selected, onBrowse, navigationKey, reduced, onEndChange }: GalleryProps) {
   const { gl } = useThree()
   const progress = useRef({ target: Math.floor(selected / 2), current: Math.floor(selected / 2), manual: false })
@@ -128,7 +128,7 @@ function GalleryInterior(props: GalleryProps) {
       </group>)}
     </group>)}
     <MuseumPortal position={[0, 0, GALLERY_ENTRANCE_Z]} rotation={Math.PI} destination="/hall" title="The Grand Rotunda" caption="Return to the Main Hall →" stone={textures.stone} />
-    {props.writing ? <OpenBookAlcove endZ={galleryEndZ(exhibits.length)} stone={textures.stone} onOpen={props.onBookClick || (() => undefined)} /> : <PortraitAlcove endZ={galleryEndZ(exhibits.length)} stone={textures.stone} />}
+    {props.writing ? <OpenBookAlcove endZ={galleryEndZ(exhibits.length)} stone={textures.stone} onOpen={props.onBookClick || (() => undefined)} /> : <PortraitAlcove endZ={galleryEndZ(exhibits.length)} stone={textures.stone} portraitSrc={props.endPortraitSrc} />}
     {exhibits.map((exhibit, index) => <ExhibitDisplay key={exhibit.id} exhibit={exhibit} index={index} active={index === selected} onSelect={onSelect} lite={lite} />)}
   </>
 }

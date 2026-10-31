@@ -56,7 +56,7 @@ function BasementChandelier({ materials }: { materials: { ivory: THREE.Material;
 
 function BasementCamera({ exhibits, selected, onBrowse, reduced }: { exhibits: Exhibit[]; selected: number; onBrowse: (index: number) => void; reduced: boolean }) {
   const { gl } = useThree()
-  const state = useRef({ target: -1, current: -1 })
+  const state = useRef({ target: 0, current: 0 })
   const arrival = useRef(true)
   const heading = useRef({ yaw: 0, pitch: .04 })
   const destination = useMemo(() => new THREE.Vector3(), [])
@@ -82,11 +82,11 @@ function BasementCamera({ exhibits, selected, onBrowse, reduced }: { exhibits: E
       event.preventDefault()
       advance(event.deltaY > 0 ? 1 : -1)
     }
-    let drag: { x: number; y: number; mode: 'look' | 'walk' } | null = null
+    let drag: { x: number; y: number; mode: 'pending' | 'look' | 'walk' } | null = null
     let distance = 0
     const down = (event: PointerEvent) => {
       if (event.button !== 0 && event.pointerType !== 'touch') return
-      drag = { x: event.clientX, y: event.clientY, mode: event.pointerType === 'touch' ? 'walk' : 'look' }
+      drag = { x: event.clientX, y: event.clientY, mode: event.pointerType === 'touch' ? 'pending' : 'look' }
       distance = 0
       canvas.setPointerCapture(event.pointerId)
       canvas.style.cursor = 'grabbing'
@@ -95,6 +95,10 @@ function BasementCamera({ exhibits, selected, onBrowse, reduced }: { exhibits: E
       if (!drag) return
       const dx = event.clientX - drag.x
       const dy = event.clientY - drag.y
+      if (drag.mode === 'pending') {
+        if (Math.hypot(dx, dy) < 6) return
+        drag.mode = Math.abs(dx) > Math.abs(dy) ? 'look' : 'walk'
+      }
       distance += Math.abs(dx) + Math.abs(dy)
       if (drag.mode === 'walk') {
         if (Math.abs(dy) > 18) {
@@ -113,8 +117,10 @@ function BasementCamera({ exhibits, selected, onBrowse, reduced }: { exhibits: E
     const click = (event: MouseEvent) => { if (distance > 8) { event.stopImmediatePropagation(); distance = 0 } }
     const keydown = (event: KeyboardEvent) => {
       if (event.target instanceof HTMLElement && event.target.closest('button,a,input,textarea,[role="dialog"]')) return
-      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') { event.preventDefault(); advance(1) }
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') { event.preventDefault(); advance(-1) }
+      if (event.key === 'ArrowRight') { event.preventDefault(); advance(1) }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); advance(-1) }
+      if (event.key.toLowerCase() === 'd') { event.preventDefault(); heading.current.yaw -= .12 }
+      if (event.key.toLowerCase() === 'a') { event.preventDefault(); heading.current.yaw += .12 }
       if (event.key.toLowerCase() === 'r') { heading.current.yaw = 0; heading.current.pitch = .04 }
     }
     root?.addEventListener('wheel', wheel as EventListener, { passive: false })
@@ -141,19 +147,18 @@ function BasementCamera({ exhibits, selected, onBrowse, reduced }: { exhibits: E
   useFrame(({ camera }, dt) => {
     const motion = state.current
     motion.current = reduced ? motion.target : THREE.MathUtils.damp(motion.current, motion.target, 6, Math.min(dt, .05))
-    if (motion.current < 0) {
+    const angle = arrival.current ? 0 : Math.PI * 2 * motion.current / Math.max(exhibits.length, 1)
+    if (arrival.current) {
       camera.position.set(0, 3.5, 0)
-      camera.lookAt(0, 3.5, -11)
-      return
+    } else {
+      destination.set(Math.sin(angle) * 16.5, 3.5, -Math.cos(angle) * 16.5)
+      camera.position.lerp(destination, reduced ? 1 : 1 - Math.exp(-7 * Math.min(dt, .05)))
     }
-    const angle = Math.PI * 2 * motion.current / Math.max(exhibits.length, 1)
-    destination.set(Math.sin(angle) * 16.5, 3.5, -Math.cos(angle) * 16.5)
-    camera.position.lerp(destination, reduced ? 1 : 1 - Math.exp(-7 * dt))
     const { yaw, pitch } = heading.current
     look.set(
-      camera.position.x + Math.sin(angle + yaw) * 11,
+      camera.position.x + Math.sin(angle + yaw) * Math.cos(pitch) * 11,
       camera.position.y + Math.sin(pitch) * 11,
-      camera.position.z - Math.cos(angle + yaw) * 11,
+      camera.position.z - Math.cos(angle + yaw) * Math.cos(pitch) * 11,
     )
     camera.lookAt(look)
   })

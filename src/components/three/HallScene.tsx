@@ -1,5 +1,5 @@
 import { MuseumPortal } from './MuseumPortal'
-import { circularWallGeometry } from './museumArchitecture'
+import { circularFloorWithOpening, circularWallGeometry } from './museumArchitecture'
 import { SceneBoundary, SceneFallback } from '../SceneBoundary'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
@@ -16,6 +16,9 @@ import { createMarbleTexture, createStoneTexture, createColumnTexture, createPla
 type Materials = { stone: THREE.MeshStandardMaterial; ivory: THREE.MeshStandardMaterial; marble: THREE.MeshStandardMaterial; brass: THREE.MeshStandardMaterial; walnut: THREE.MeshStandardMaterial; dark: THREE.MeshStandardMaterial; plaster: THREE.MeshStandardMaterial; burgundy: THREE.MeshStandardMaterial }
 const CENTER_Z = 3
 const ARCH_ANGLES = [-.94, -.44, .44, .94]
+const BASEMENT_ENTRY_ANGLE = 2.775
+const BASEMENT_ARCH_RADIUS = 1.85
+const BASEMENT_ARCH_SPRING = 2.65
 const polar = (radius: number, angle: number, y = 0): [number, number, number] => [radius * Math.sin(angle), y, CENTER_Z - radius * Math.cos(angle)]
 
 function Block({ position, size, material }: { position: [number, number, number]; size: [number, number, number]; material: THREE.Material }) {
@@ -239,6 +242,7 @@ function GalleryWall({ material }: { material: THREE.Material }) {
     ...ARCH_ANGLES.flatMap(angle => [0, 5.2].map(floor => ({ angle, floor, radius: 1.62, spring: 2.65 }))),
     { angle: 0, floor: 0, radius: 1.62, spring: 2.65 },
     { angle: 0, floor: 5.2, radius: 1.62, spring: 2.65 },
+    { angle: BASEMENT_ENTRY_ANGLE, floor: 0, radius: BASEMENT_ARCH_RADIUS, spring: BASEMENT_ARCH_SPRING },
     { angle: Math.PI, floor: 0, radius: 2.6, spring: 4.2 },
   ]), [])
   useEffect(() => () => geometry.dispose(), [geometry])
@@ -406,42 +410,72 @@ function CuratorBoard({ side, title, eyebrow, lines, accent, materials, id, onCl
 function BasementEntrance({ materials }: { materials: Materials }) {
   const signTexture = useMemo(() => {
     const canvas = document.createElement('canvas')
-    canvas.width = 900
-    canvas.height = 260
+    canvas.width = 1000
+    canvas.height = 760
     const context = canvas.getContext('2d')!
     context.fillStyle = '#17231f'
     context.fillRect(0, 0, canvas.width, canvas.height)
     context.strokeStyle = '#c9a968'
-    context.lineWidth = 8
-    context.strokeRect(18, 18, canvas.width - 36, canvas.height - 36)
+    context.lineWidth = 9
+    context.strokeRect(24, 24, canvas.width - 48, canvas.height - 48)
     context.textAlign = 'center'
-    context.fillStyle = '#f4e7c7'
-    context.font = 'bold 62px Georgia'
-    context.fillText('FAILED IDEAS', canvas.width / 2, 125)
     context.fillStyle = '#d6bd7d'
-    context.font = '24px sans-serif'
-    context.fillText('BASEMENT ARCHIVE  ·  DOWNSTAIRS', canvas.width / 2, 185)
+    context.font = '30px sans-serif'
+    context.fillText('B1  ·  LOWER LEVEL', canvas.width / 2, 145)
+    context.fillStyle = '#f4e7c7'
+    context.font = 'bold 82px Georgia'
+    context.fillText('BASEMENT', canvas.width / 2, 300)
+    context.fillStyle = '#d6bd7d'
+    context.font = '42px Georgia'
+    context.fillText('(FAILED PROJECTS)', canvas.width / 2, 385)
+    context.strokeStyle = '#8c794f'; context.lineWidth = 2
+    context.beginPath(); context.moveTo(150, 445); context.lineTo(850, 445); context.stroke()
+    context.font = '27px sans-serif'
+    context.fillText('EXPERIMENTS  ·  DEAD ENDS  ·  LESSONS', canvas.width / 2, 515)
+    context.fillStyle = '#f4e7c7'; context.font = '26px sans-serif'
+    context.fillText('ENTER THE ARCHIVE  ↓', canvas.width / 2, 635)
     const texture = new THREE.CanvasTexture(canvas)
     texture.colorSpace = THREE.SRGBColorSpace
     return texture
   }, [])
   useEffect(() => () => signTexture.dispose(), [signTexture])
-  return <group position={[7.1, 0, 30.9]} onClick={event => { event.stopPropagation(); window.location.assign('/basement') }} onPointerOver={() => { document.body.style.cursor = 'pointer' }} onPointerOut={() => { document.body.style.cursor = '' }}>
-    <Block position={[0, 1.65, 0]} size={[3.6, 3.1, .3]} material={materials.dark} />
-    <mesh position={[0, 1.65, .18]}><planeGeometry args={[3.35, 2.85]} /><meshBasicMaterial map={signTexture} toneMapped={false} /></mesh>
-    <mesh position={[0, .15, -.5]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[1.35, 1.35, .08, 32]} /><meshStandardMaterial color="#121916" /></mesh>
-    {Array.from({ length: 7 }, (_, i) => <group key={i} position={[0, -.05 - i * .16, -.72 - i * .43]}>
-      <Block position={[0, 0, 0]} size={[2.7 - i * .1, .18, .52]} material={materials.marble} />
-      <Block position={[0, .1, .02]} size={[2.25 - i * .08, .025, .45]} material={materials.burgundy} />
+  return <group position={polar(HALL_RADIUS, BASEMENT_ENTRY_ANGLE)} rotation={[0, -BASEMENT_ENTRY_ANGLE, 0]} onClick={event => { event.stopPropagation(); window.location.assign('/basement') }} onPointerOver={() => { document.body.style.cursor = 'pointer' }} onPointerOut={() => { document.body.style.cursor = '' }}>
+    {/* The open voussoir arch matches the gallery entrances; the stairs visibly descend through the floor. */}
+    {[-1, 1].map(side => <group key={side}>
+      <Block position={[side * 1.98, 1.32, 0]} size={[.34, 2.64, .48]} material={materials.marble} />
+      <Block position={[side * 1.98, .18, .08]} size={[.54, .36, .62]} material={materials.ivory} />
+      <Block position={[side * 1.98, 2.67, .08]} size={[.56, .2, .62]} material={materials.ivory} />
     </group>)}
-    <Block position={[-1.45, .55, -1.7]} size={[.1, 1.2, 3.3]} material={materials.brass} />
-    <Block position={[1.45, .55, -1.7]} size={[.1, 1.2, 3.3]} material={materials.brass} />
-    <pointLight position={[0, .3, -1.3]} intensity={45} color="#b4d2c0" distance={8} />
+    {Array.from({ length: 17 }, (_, i) => {
+      const a = i / 16 * Math.PI
+      return <mesh key={i} position={[Math.cos(a) * 1.98, BASEMENT_ARCH_SPRING + Math.sin(a) * 1.98, .02]} rotation={[0, 0, a - Math.PI / 2]} material={i === 8 ? materials.brass : materials.ivory} castShadow><boxGeometry args={[.36, .38, .56]} /></mesh>
+    })}
+    <Block position={[3.34, 2.2, .13]} size={[2.48, 1.96, .18]} material={materials.brass} />
+    <mesh position={[3.34, 2.2, .235]}><planeGeometry args={[2.3, 1.78]} /><meshBasicMaterial map={signTexture} toneMapped={false} /></mesh>
+    {/* The stairwell stays open to view; slim rails mark the descent without boxing it in. */}
+    {Array.from({ length: 8 }, (_, i) => <group key={`descent-${i}`} position={[0, -i * .17 - .085, .7 + i * .48]}>
+      <Block position={[0, 0, 0]} size={[3.56 - i * .055, .17, .54]} material={materials.marble} />
+      <Block position={[0, .086, .02]} size={[3.3 - i * .055, .018, .48]} material={materials.burgundy} />
+    </group>)}
+    {[-1, 1].map(side => <group key={`descent-rail-${side}`}>
+      {Array.from({ length: 7 }, (_, i) => {
+        const start = new THREE.Vector3(side * 1.83, -i * .17 + .92, .7 + i * .48)
+        const end = new THREE.Vector3(side * 1.83, -(i + 1) * .17 + .92, .7 + (i + 1) * .48)
+        const direction = end.clone().sub(start)
+        return <mesh key={i} position={start.clone().add(end).multiplyScalar(.5)} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize())} material={materials.brass}><cylinderGeometry args={[.055, .055, direction.length() + .02, 8]} /></mesh>
+      })}
+      {Array.from({ length: 5 }, (_, i) => <mesh key={i} position={[side * 1.83, -i * .34 + .43, .7 + i * .96]} material={materials.ivory}><cylinderGeometry args={[.045, .055, .9, 8]} /></mesh>)}
+    </group>)}
+    <Block position={[0, -1.3, 5.72]} size={[2.6, .12, .3]} material={materials.marble} />
+    <mesh position={[0, -.94, 5.86]}><planeGeometry args={[2.35, .9]} /><meshBasicMaterial color="#101a17" /></mesh>
+    <pointLight position={[0, 1.55, 3.8]} intensity={18} color="#c5d7c1" distance={8} />
+    <pointLight position={[3.45, 2.1, .34]} intensity={10} color="#ffd99c" distance={5} />
   </group>
 }
 function Interior({ lite, view, interactive, zoom, onView, navigationKey, onScrollStage, onCuratorBoardClick }: { lite: boolean; view: HallView; interactive: boolean; zoom: number; onView: (view: HallView) => void; navigationKey: number; onScrollStage?: (view: HallView) => void; onCuratorBoardClick?: (id: CuratorBoardId) => void }) {
   const camera = useThree(state => state.camera)
   const textures = useMemo(() => ({ marble: createMarbleTexture(2, 2), wall: createStoneTexture(10, 2, '#c4b59c'), column: createColumnTexture(), plaque: createPlaqueTexture() }), [])
+  const floorGeometry = useMemo(() => circularFloorWithOpening(HALL_RADIUS + .5, CENTER_Z, BASEMENT_ENTRY_ANGLE, 4.2, 6.3, HALL_RADIUS), [])
   const materials = useMemo<Materials>(() => ({
     stone: new THREE.MeshStandardMaterial({ map: textures.wall, bumpMap: textures.wall, bumpScale: .035, color: '#c2ae8f', roughness: .92, side: THREE.DoubleSide }),
     ivory: new THREE.MeshStandardMaterial({ map: textures.column, color: '#dfd1b7', roughness: .58 }),
@@ -452,7 +486,7 @@ function Interior({ lite, view, interactive, zoom, onView, navigationKey, onScro
     plaster: new THREE.MeshStandardMaterial({ color: '#a9a28a', roughness: .95 }),
     burgundy: new THREE.MeshStandardMaterial({ color: '#32151b', roughness: 1 }),
   }), [textures])
-  useEffect(() => () => { Object.values(textures).forEach(t => t.dispose()); Object.values(materials).forEach(m => m.dispose()) }, [textures, materials])
+  useEffect(() => () => { Object.values(textures).forEach(t => t.dispose()); Object.values(materials).forEach(m => m.dispose()); floorGeometry.dispose() }, [textures, materials, floorGeometry])
   return <>
     <Camera key={navigationKey} view={view} interactive={interactive} zoom={zoom} onScrollStage={onScrollStage} />
     <fog attach="fog" args={['#171c1b', 70, 150]} />
@@ -460,12 +494,16 @@ function Interior({ lite, view, interactive, zoom, onView, navigationKey, onScro
     <hemisphereLight args={['#c3d2dc', '#45321f', .9]} />
     <directionalLight position={[-12, 25, 18]} intensity={2.3} color="#f8e4c2" castShadow={!lite} shadow-mapSize={[1024, 1024]} shadow-camera-left={-36} shadow-camera-right={36} shadow-camera-top={36} shadow-camera-bottom={-36} shadow-bias={-.0003} />
     <pointLight position={[2, 9, 9]} intensity={110} distance={50} color="#ffe0ac" />
-    <mesh position={[0, 0, CENTER_Z]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[HALL_RADIUS + .5, 144]} />
+    <mesh geometry={floorGeometry} position={[0, 0, CENTER_Z]} receiveShadow>
       {lite ? <meshStandardMaterial map={textures.marble} color="#726e61" roughness={.55} /> : <MeshReflectorMaterial map={textures.marble} resolution={256} blur={[100, 30]} mixBlur={1} mixStrength={1.2} mirror={.22} color="#787466" roughness={.4} metalness={.18} />}
     </mesh>
     {/* Inlaid concentric marble bands replace the flat checkerboard floor. */}
-    {[3, 7, 13, 23.9, 28.3].map(radius => <mesh key={radius} position={[0, .015, CENTER_Z]} rotation={[-Math.PI / 2, 0, 0]} material={materials.brass}><ringGeometry args={[radius, radius + .035, 144]} /></mesh>)}
-    {Array.from({ length: 24 }, (_, i) => <mesh key={i} position={[0, .012, CENTER_Z]} rotation={[-Math.PI / 2, 0, i / 24 * Math.PI * 2]} material={materials.dark}><ringGeometry args={[7, HALL_RADIUS, 1, 1, 0, .002]} /></mesh>)}
+    {[3, 7, 13].map(radius => <mesh key={radius} position={[0, .015, CENTER_Z]} rotation={[-Math.PI / 2, 0, 0]} material={materials.brass}><ringGeometry args={[radius, radius + .035, 144]} /></mesh>)}
+    {Array.from({ length: 24 }, (_, i) => {
+      const theta = i / 24 * Math.PI * 2, radialAngle = theta + Math.PI / 2
+      if (Math.abs(Math.atan2(Math.sin(radialAngle - BASEMENT_ENTRY_ANGLE), Math.cos(radialAngle - BASEMENT_ENTRY_ANGLE))) < .09) return null
+      return <mesh key={i} position={[0, .012, CENTER_Z]} rotation={[-Math.PI / 2, 0, theta]} material={materials.dark}><ringGeometry args={[7, HALL_RADIUS, 1, 1, 0, .002]} /></mesh>
+    })}
     {Array.from({ length: 16 }, (_, i) => <mesh key={i} position={[Math.sin(i / 16 * Math.PI * 2) * 4.3, .018, CENTER_Z - Math.cos(i / 16 * Math.PI * 2) * 4.3]} rotation={[-Math.PI / 2, 0, -i / 16 * Math.PI * 2]} material={i % 2 ? materials.marble : materials.dark}><circleGeometry args={[.65, 4]} /></mesh>)}
     {/* Continuous semicircular apse and curved upper gallery. */}
     <GalleryWall material={materials.stone} />

@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Info, LockKeyhole, Plus, Trash2 } from 'lucide-r
 import type { Room } from '../data/museum'
 import { ExhibitDossier, CuratorDossier } from '../components/ExhibitDossier'
 import { collections } from '../data/collection'
+import { endPortraits } from '../data/endPortraits'
 import { skills as skillCatalogue } from '../data/skills'
 import { useMuseum } from '../context/museum-context'
 import { useLiteMode, usePrefersReducedMotion } from '../hooks/useDevice'
@@ -36,7 +37,7 @@ function GalleryRoom({ room }: { room: Room & { id: Exclude<Room['id'], 'skills'
   const select = (i: number) => { setSelected(i); setNavigationKey(k => k + 1); setInfoOpen(true) }
   const isBasement = room.id === 'basement'
   return <main className="museum-gallery" data-info-open={infoOpen}>
-    <div className="museum-gallery-scene">{isBasement ? <BasementScene exhibits={collection.exhibits} selected={selected} onSelect={select} onBrowse={setSelected} lite={lite} reduced={reduced} /> : <GalleryScene exhibits={collection.exhibits} selected={selected} onSelect={select} onBrowse={setSelected} navigationKey={navigationKey} onEndChange={setAtEnd} writing={room.id === 'writing'} onBookClick={() => setUpcomingOpen(true)} lite={lite} reduced={reduced} />}</div>
+    <div className="museum-gallery-scene">{isBasement ? <BasementScene exhibits={collection.exhibits} selected={selected} onSelect={select} onBrowse={setSelected} lite={lite} reduced={reduced} /> : <GalleryScene endPortraitSrc={endPortraits[room.id]} exhibits={collection.exhibits} selected={selected} onSelect={select} onBrowse={setSelected} navigationKey={navigationKey} onEndChange={setAtEnd} writing={room.id === 'writing'} onBookClick={() => setUpcomingOpen(true)} lite={lite} reduced={reduced} />}</div>
     <div className="museum-gallery-shade" aria-hidden="true" />
     <nav className="museum-gallery-nav"><Link to="/hall" className="btn-quiet"><ArrowLeft size={13} />Back to Hall</Link><Link to="/" className="gallery-wordmark">The Museum of Kishore</Link><span>{room.floor}</span></nav>
     <header className="museum-gallery-title"><p className="eyebrow">{room.floor}</p><h1>{atEnd ? 'Meet the curator' : room.name}</h1><p>{atEnd ? 'Kishore M · Software engineer · AI & Data Science · Chennai' : collection.introduction}</p></header>

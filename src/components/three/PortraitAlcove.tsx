@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useMemo } from 'react'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { portraitViewport, PORTRAIT_WIDTH, PORTRAIT_HEIGHT } from './portraitFraming'
 
 function engraving(title: string, sections: Array<[string, string]>) {
   const canvas = document.createElement('canvas'); canvas.width = 800; canvas.height = 1300
@@ -17,11 +18,20 @@ function engraving(title: string, sections: Array<[string, string]>) {
   }
   const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8; return texture
 }
-function Portrait() {
-  const source = useTexture('/images/kishore-portrait.jpeg')
-  const texture = useMemo(() => { const t = source.clone(); t.colorSpace = THREE.SRGBColorSpace; return t }, [source])
+function Portrait({ src }: { src: string }) {
+  const source = useTexture(src)
+  const texture = useMemo(() => {
+    const t = source.clone()
+    const image = source.image as { width: number; height: number }
+    const crop = portraitViewport(src, image.width, image.height)
+    t.colorSpace = THREE.SRGBColorSpace
+    t.repeat.set(...crop.repeat)
+    t.offset.set(...crop.offset)
+    t.needsUpdate = true
+    return t
+  }, [source, src])
   useEffect(() => () => texture.dispose(), [texture])
-  return <mesh position={[0, 4.3, -7.27]}><planeGeometry args={[3.65, 6.32]} /><meshBasicMaterial map={texture} toneMapped={false} /></mesh>
+  return <mesh position={[0, 4.3, -7.27]}><planeGeometry args={[PORTRAIT_WIDTH, PORTRAIT_HEIGHT]} /><meshBasicMaterial map={texture} toneMapped={false} transparent /></mesh>
 }
 function nameplate() {
   const canvas = document.createElement('canvas'); canvas.width = 1400; canvas.height = 240
@@ -32,7 +42,7 @@ function nameplate() {
   c.fillStyle = '#ceb982'; c.font = '28px sans-serif'; c.fillText('SOFTWARE ENGINEERING · AI & DATA SCIENCE · CHENNAI', 700, 185)
   const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8; return texture
 }
-export function PortraitAlcove({ endZ, stone }: { endZ: number; stone: THREE.Texture }) {
+export function PortraitAlcove({ endZ, stone, portraitSrc = '/images/kishore-portrait.jpeg' }: { endZ: number; stone: THREE.Texture; portraitSrc?: string }) {
   const panels = useMemo(() => [
     engraving('The foundations', [['EDUCATION · 2023–2027', 'B.Tech in Artificial Intelligence and Data Science, Chennai Institute of Technology.'], ['ACADEMIC RECORD', 'CGPA 8.74 / 10'], ['THE PRACTICE', 'Machine learning, generative AI, RAG systems and software engineering.']]),
     engraving('The journey', [['MICROSOFT · MAY–JULY 2026', 'Software Engineer Intern. Anomaly detection, monitoring and incident automation.'], ['RESEARCH · NOV–DEC 2024', 'Chennai Institute of Technology. Voice-controlled systems and chess AI.'], ['NEXT CHAPTER', 'Seeking software engineering and AI / ML engineering opportunities.']]),
@@ -48,7 +58,8 @@ export function PortraitAlcove({ endZ, stone }: { endZ: number; stone: THREE.Tex
     <mesh position={[0, 6, .03]}><torusGeometry args={[7.92, .16, 10, 80, Math.PI]} /><meshStandardMaterial color="#c6b389" roughness={.45} /></mesh>
     <mesh position={[0, 4.3, -7.45]}><boxGeometry args={[4.1, 6.78, .24]} /><meshStandardMaterial color="#715933" metalness={.6} roughness={.4} /></mesh>
     <mesh position={[0, 4.3, -7.31]}><boxGeometry args={[3.85, 6.52, .04]} /><meshStandardMaterial color="#d1b374" metalness={.55} roughness={.3} /></mesh>
-    <Suspense fallback={null}><Portrait /></Suspense>
+    <mesh position={[0, 4.3, -7.28]}><planeGeometry args={[PORTRAIT_WIDTH, PORTRAIT_HEIGHT]} /><meshBasicMaterial color="#17241f" toneMapped={false} /></mesh>
+    <Suspense fallback={null}><Portrait key={portraitSrc} src={portraitSrc} /></Suspense>
     <mesh position={[0, .43, -7.1]}><boxGeometry args={[4.6, .62, .8]} /><meshStandardMaterial color="#d1c5a7" map={stone} roughness={.5} /></mesh>
     <mesh position={[0, .47, -6.68]}><planeGeometry args={[3.4, .55]} /><meshBasicMaterial map={panels[2]} toneMapped={false} /></mesh>
     {[-1, 1].map((side, i) => <group key={side} position={[side * 5.3, 3.5, -5.65]} rotation={[0, -side * .72, 0]}>

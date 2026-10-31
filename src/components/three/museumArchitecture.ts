@@ -3,6 +3,25 @@ import * as THREE from 'three'
 export type CircularOpening = { angle: number; floor: number; radius: number; spring: number }
 const wrap = (angle: number) => Math.atan2(Math.sin(angle), Math.cos(angle))
 
+/** Marble ground plane with an accurately aligned stairwell cut through its surface. */
+export function circularFloorWithOpening(radius: number, centerZ: number, angle: number, width: number, depth: number, entryRadius = radius) {
+  const shape = new THREE.Shape()
+  shape.absarc(0, 0, radius, 0, Math.PI * 2, false)
+  const hole = new THREE.Path()
+  const x = Math.sin(angle) * entryRadius, z = centerZ - Math.cos(angle) * entryRadius
+  const corners = [[-width / 2, -.35], [width / 2, -.35], [width / 2, depth], [-width / 2, depth]]
+  for (let i = 0; i < corners.length; i++) {
+    const [u, v] = corners[i]
+    const point = [x + Math.cos(angle) * u - Math.sin(angle) * v, -(z + Math.sin(angle) * u + Math.cos(angle) * v - centerZ)] as [number, number]
+    if (i === 0) hole.moveTo(...point); else hole.lineTo(...point)
+  }
+  hole.closePath()
+  shape.holes.push(hole)
+  const geometry = new THREE.ShapeGeometry(shape, 144)
+  geometry.rotateX(-Math.PI / 2)
+  return geometry
+}
+
 /** Continuous 360° masonry, with genuine openings and no mismatched semicircles. */
 export function circularWallGeometry(radius: number, height: number, centerZ: number, openings: CircularOpening[]) {
   const positions: number[] = [], uvs: number[] = []

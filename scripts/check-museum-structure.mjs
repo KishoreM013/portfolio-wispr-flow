@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict'
 import * as THREE from 'three'
-import { circularWallGeometry, portalWallGeometry, portalOpeningGeometry } from '../src/components/three/museumArchitecture.ts'
+import { circularWallGeometry, circularFloorWithOpening, portalWallGeometry, portalOpeningGeometry } from '../src/components/three/museumArchitecture.ts'
 import { HALL_RADIUS, HALL_CENTER_Z, HALL_WALL_HEIGHT, HALL_BALCONY_INNER, HALL_STAIR_FIRST_Z, HALL_STAIR_DEPTH, createHallRoute, UPPER_INNER_RADIUS, UPPER_OUTER_RADIUS } from '../src/components/three/hallNavigation.ts'
 import { GALLERY_ENTRANCE_Z } from '../src/components/three/galleryNavigation.ts'
 const angles = [-.94, -.44, .44, .94]
-const geometry = circularWallGeometry(HALL_RADIUS, HALL_WALL_HEIGHT, HALL_CENTER_Z, [...angles.flatMap(angle => [0, 5.2].map(floor => ({ angle, floor, radius: 1.62, spring: 2.65 }))), { angle: Math.PI, floor: 0, radius: 2.6, spring: 4.2 }])
+const basementAngle = 2.775
+const geometry = circularWallGeometry(HALL_RADIUS, HALL_WALL_HEIGHT, HALL_CENTER_Z, [...angles.flatMap(angle => [0, 5.2].map(floor => ({ angle, floor, radius: 1.62, spring: 2.65 }))), { angle: basementAngle, floor: 0, radius: 1.85, spring: 2.65 }, { angle: Math.PI, floor: 0, radius: 2.6, spring: 4.2 }])
 const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
 const wall = new THREE.Mesh(geometry, material); wall.updateMatrixWorld(true)
 const ray = new THREE.Raycaster()
@@ -17,6 +18,7 @@ for (let i = 0; i < 720; i++) {
 }
 for (const angle of angles) for (const y of [1, 6.5]) assert.equal(fire(angle, y).length, 0, 'Both gallery floors retain their open arches')
 assert.equal(fire(Math.PI, 1).length, 0, 'The entrance is a genuine opening in the shell')
+assert.equal(fire(basementAngle, 1).length, 0, 'The basement arch is cut into the curved wall')
 assert.ok(fire(.44, 4.8).length, 'Masonry fills the spandrel between floors')
 // Rays just above the wall must hit the matching dome, in every direction.
 const roof = new THREE.Mesh(new THREE.SphereGeometry(HALL_RADIUS, 112, 40, 0, Math.PI * 2, 0, Math.PI / 2), material)
@@ -47,4 +49,13 @@ for (const config of [{ width: 16, height: 14, spring: 3.4 }, { width: 12, heigh
   portal.geometry.dispose(); trigger.geometry.dispose()
 }
 geometry.dispose(); roof.geometry.dispose(); material.dispose()
+const floorGeometry = circularFloorWithOpening(HALL_RADIUS + .5, HALL_CENTER_Z, basementAngle, 4.2, 6.3, HALL_RADIUS)
+const floor = new THREE.Mesh(floorGeometry, material); floor.position.z = HALL_CENTER_Z; floor.updateMatrixWorld(true)
+const entryX = Math.sin(basementAngle) * HALL_RADIUS - Math.sin(basementAngle) * 2.5
+const entryZ = HALL_CENTER_Z - Math.cos(basementAngle) * HALL_RADIUS + Math.cos(basementAngle) * 2.5
+ray.set(new THREE.Vector3(entryX, 2, entryZ), new THREE.Vector3(0, -1, 0))
+assert.equal(ray.intersectObject(floor).length, 0, 'The stairwell cut stays open through the hall floor')
+ray.set(new THREE.Vector3(entryX + Math.cos(basementAngle) * 2.5, 2, entryZ + Math.sin(basementAngle) * 2.5), new THREE.Vector3(0, -1, 0))
+assert.ok(ray.intersectObject(floor).length, 'The marble floor remains intact on both sides of the stairwell')
+floor.geometry.dispose()
 console.log('Museum structure checks passed: 360° walls, matching roof, ten arch openings, entrance apertures, stair landing and click surfaces.')
